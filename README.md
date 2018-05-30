@@ -1,6 +1,6 @@
 # lua-2018-project
 # Project description
-A small microframework for Web development which supports simple routing, template rendering and other minor things like logging, sesison handling, etc.
+A small microframework for Web development which supports simple routing, template rendering and other minor things like logging, session handling, etc.
 
 # Project phases
 - **Phase 1**: research available instruments. We need at least: HTTP library, existing HTML template language for Lua. Prepare a little prototype using found instruments. Decide on framework's project structure

@@ -11,20 +11,11 @@ local Headers = require "http.headers"
 local Server = require "http.server"
 local Version = require "http.version"
 local HttpUtil = require "http.util"
---local Zlib = require "http.zlib"
+local Template = require "resty.template"
 
 local defaultServer = string.format("%s%s", Version.name, Version.version)
 
-local helloText = [[
-<html>
-    <head>
-        <title>Hello</title>
-    </head>
-    <body>
-        Hello, World!
-    </body>
-</html>
-]]
+local renderHelloTemplate = Template.compile("hello.html")
 
 local responseMethods = {}
 local responseMt = {
@@ -37,14 +28,22 @@ local function newResponse(requestHeaders, stream)
     headers:append(":status", "200")
     headers:append("server", defaultServer)
     headers:append("date", HttpUtil.imf_date())
-    headers:append("content-length", tostring(#helloText))
+
+    local message = requestHeaders:get(":path"):sub(2)
+
+    if (message == '') then
+        message = 'Default message'
+    end
+
+    local body = renderHelloTemplate({message = message})
+    headers:append("content-length", tostring(#body))
 
     return setmetatable({
         requestHeaders = requestHeaders,
         stream = stream,
         peername = select(2, stream:peername()),
         headers = headers,
-        body = helloText
+        body = body
     }, responseMt)
 end
 

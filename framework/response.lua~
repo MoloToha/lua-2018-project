@@ -1,5 +1,6 @@
 local Version = require "http.version"
 local HttpUtil = require "http.util"
+local Zlib = require "http.zlib"
 local Headers = require "http.headers"
 
 local responseMethods = {}
@@ -76,6 +77,17 @@ function responseMethods:setAsError503()
     self.headers = headers
     headers:append("content-type", "text/html")
     self:setBody(errorText)
+end
+
+function responseMethods:enableCompression()
+    if self.headers:has("content-encoding") then
+        return false
+    end
+    local deflater = Zlib.deflate()
+    local newBody = deflater(self.body, true)
+    self.headers:append("content-encoding", "gzip")
+    self.body = newBody
+    return true
 end
 
 return  {
